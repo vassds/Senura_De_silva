@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CTF Challenge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body { background: #050505; color: #fff; font-family: 'Fira Code'; padding: 40px; text-align: center; }
+        .container { max-width: 800px; margin: 0 auto; border: 1px solid #333; padding: 40px; border-radius: 10px; background: #0f0f0f; }
+        h1 { color: #00ff41; margin-bottom: 10px; }
+        .desc { color: #aaa; line-height: 1.6; margin-bottom: 30px; }
+        .btn { background: #00ff41; color: #000; padding: 12px 25px; text-decoration: none; font-weight: bold; display: inline-block; margin: 20px 0; border-radius: 4px; transition: 0.3s; }
+        .btn:hover { box-shadow: 0 0 15px #00ff41; }
+        .input-group { margin-top: 30px; border-top: 1px solid #222; padding-top: 20px; }
+        input { padding: 10px; border: 1px solid #333; background: #000; color: #fff; width: 60%; font-family: 'Fira Code'; }
+        button { padding: 10px 20px; background: #333; color: #fff; border: none; cursor: pointer; }
+        button:hover { background: #555; }
+        .back-link { display: block; margin-top: 20px; color: #666; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- PASTE SPECIFIC CONTENT HERE -->
+<h1>TARGET: Database Breach</h1>
+<p class="desc">Bypass the login screen. We know the username is <code>admin</code>.</p>
+<p><strong>Hint:</strong> SQL Logic error. Try closing the quote and commenting out the rest.</p>
+<input type="text" id="user" placeholder="Username" style="display:block; margin: 10px auto;">
+<input type="password" id="pass" placeholder="Password" style="display:block; margin: 10px auto;">
+<button onclick="checkSQL()" class="btn">LOGIN</button>
+<div id="sql-msg"></div>
+<script>
+    function checkSQL() {
+        const u = document.getElementById('user').value;
+        if(u.includes("' OR 1=1") || u.includes("' OR '1'='1")) {
+            document.getElementById('sql-msg').innerHTML = "<br><span style='color:#00ff41'>Logged In! Flag: flag{sql_injection_master}</span>";
+        } else {
+            document.getElementById('sql-msg').innerHTML = "<br><span style='color:red'>Invalid Credentials</span>";
+        }
+    }
+</script>
+<a href="../index.html" class="back-link">Back to Operations</a>
+
+    </div>
+
+    <script>
+        function checkFlag(correctFlag) {
+            const input = document.getElementById('flagInput').value;
+            if(input === correctFlag) alert("ACCESS GRANTED! Challenge Solved.");
+            else alert("ACCESS DENIED. Incorrect Flag.");
+        }
+    </script>
+</body>
+</html>

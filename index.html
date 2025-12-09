@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senura De Silva | Ethical Hacker</title>
+    
+    <!-- --- SECURITY HEADER (Client-Side) --- -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data:;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Krona+One&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        /* --- 1. GLOBAL RESET --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-color: #050505;
+            --text-color: #e0e0e0;
+            --accent-green: #00ff41;
+            --accent-cyan: #0ff;
+            --accent-orange: #FE891D;
+            --card-bg: #0f0f0f;
+            --card-border: #222;
+            --terminal-glow: rgba(0, 255, 65, 0.05);
+        }
+
+        html { height: auto; width: 100%; overflow-x: hidden; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'DM Sans', sans-serif;
+            width: 100%;
+            overflow-x: hidden;
+            transition: all 0.5s ease;
+            
+            /* SECURITY: Disable Text Selection Globally */
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* --- ROOT ACCESS ANIMATION CLASSES --- */
+        body.root-access {
+            --accent-green: #FFD700; /* GOLD */
+            --terminal-glow: rgba(255, 215, 0, 0.3);
+            animation: rootFlash 1s ease-out;
+        }
+        
+        @keyframes rootFlash {
+            0% { background-color: #fff; }
+            10% { background-color: #FFD700; }
+            100% { background-color: #050505; }
+        }
+
+        /* --- 2. NAVBAR --- */
+        .navbar {
+            position: fixed; top: 0; left: 0; width: 100%; height: 80px;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+            background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nav-container {
+            width: 100%; max-width: 1200px; padding: 0 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .logo {
+            font-family: 'Krona One', sans-serif; font-size: 1rem;
+            text-transform: uppercase; letter-spacing: 1px; color: #fff;
+            text-decoration: none; display: flex; align-items: center; gap: 10px;
+        }
+        
+        .status-dot { width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 10px var(--accent-green); transition: background 0.5s, box-shadow 0.5s; }
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+        .nav-links a { color: #888; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--accent-green); }
+
+
+        /* --- 3. DRONE CHARACTER --- */
+        .drone-wrapper {
+            position: fixed;
+            top: 0; left: 0;
+            width: 80px; height: 80px;
+            pointer-events: none;
+            z-index: 50;
+            display: flex; justify-content: center; align-items: center;
+            will-change: transform, left, top;
+        }
+
+        .drone-core {
+            position: relative;
+            width: 40px; height: 40px;
+            background: radial-gradient(circle, var(--accent-green) 10%, #000 70%);
+            border: 1px solid var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 2;
+            transition: all 0.5s;
+        }
+
+        .drone-core i { font-size: 1.2rem; color: #fff; }
+
+        .drone-ring {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px dashed rgba(0, 255, 65, 0.5);
+            animation: spin 10s linear infinite;
+            transition: border-color 0.5s;
+        }
+        .ring-1 { width: 60px; height: 60px; border-color: var(--accent-cyan); animation-duration: 8s; border-left-color: transparent; border-right-color: transparent; }
+        .ring-2 { width: 75px; height: 75px; border-color: var(--accent-green); animation-duration: 12s; animation-direction: reverse; opacity: 0.5; border-top-color: transparent; }
+
+        .drone-label {
+            position: absolute;
+            top: -25px;
+            white-space: nowrap;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--accent-green);
+            background: rgba(0,0,0,0.8);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            opacity: 0.8;
+            transition: opacity 0.3s, color 0.5s, border-color 0.5s;
+        }
+
+        @keyframes spin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+
+        /* --- 4. SECTIONS --- */
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 5%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero-container {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            width: 100%;
+            max-width: 1400px;
+            align-items: center;
+        }
+        
+        /* Text Side */
+        .hero-content {
+            text-align: left;
+        }
+
+        .terminal-text {
+            font-family: 'Fira Code', monospace; color: var(--accent-green);
+            font-size: 1.1rem; margin-bottom: 20px; background: rgba(0, 255, 65, 0.1);
+            padding: 8px 16px; border-radius: 4px; border: 1px solid rgba(0, 255, 65, 0.2);
+            display: inline-block;
+            transition: color 0.5s, border-color 0.5s, background-color 0.5s;
+        }
+        
+        .hero h1 {
+            font-size: clamp(1.8rem, 3.5vw, 3.2rem); 
+            line-height: 1.3; 
+            margin-bottom: 1.5rem;
+            font-weight: 700; 
+            letter-spacing: 0.05em;
+            color: #fff;
+            text-shadow: 0px 0px 15px rgba(120, 120, 120, 0.6);
+        }
+        
+        .highlight-green, .highlight-cyan {
+            color: #fff;
+        }
+
+        .hero-desc { 
+            font-size: 1.2rem; 
+            color: #ccc; 
+            max-width: 600px; 
+            line-height: 1.6; 
+            margin-bottom: 30px; 
+            font-family: 'Fira Code', monospace;
+        }
+
+        .hero-btns { display: flex; gap: 20px; }
+        .btn { padding: 12px 30px; border-radius: 4px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; font-family: 'Fira Code', monospace; }
+        .btn-primary { background: var(--accent-green); color: #000; transition: background 0.5s; }
+        .btn-primary:hover { box-shadow: 0 0 20px rgba(0, 255, 65, 0.4); }
+        .btn-outline { border: 1px solid #333; color: #fff; }
+        .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.05); }
+
+        /* INTERACTIVE TERMINAL CSS */
+        .terminal-wrapper {
+            display: flex; flex-direction: column; width: 100%;
+        }
+
+        /* NEW HINT ALERT */
+        .terminal-alert {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed #444;
+            border-bottom: none;
+            padding: 10px 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            color: #aaa;
+            border-radius: 8px 8px 0 0;
+            display: flex; align-items: center; gap: 10px;
+            animation: pulse-border 2s infinite;
+        }
+        
+        @keyframes pulse-border {
+            0% { border-color: #444; }
+            50% { border-color: #666; }
+            100% { border-color: #444; }
+        }
+
+        .terminal-window {
+            width: 100%; 
+            height: 400px;
+            background: rgba(10, 10, 10, 0.95);
+            border: 1px solid #333;
+            border-radius: 0 0 8px 8px; /* Connected to alert */
+            padding: 20px;
+            text-align: left;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px var(--terminal-glow);
+            display: flex; flex-direction: column;
+            cursor: text;
+            transition: box-shadow 0.5s, border-color 0.5s;
+
+            /* ENABLE COPY/PASTE IN TERMINAL ONLY */
+            -webkit-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+        }
+
+        /* Ensure child elements also inherit selection ability */
+        .terminal-window * {
+            -webkit-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+        }
+
+        .terminal-header {
+            display: flex; gap: 8px; margin-bottom: 15px; padding-bottom: 15px;
+            border-bottom: 1px solid #222;
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27c93f; }
+
+        .terminal-output { flex: 1; color: #ccc; line-height: 1.6; white-space: pre-wrap; }
+        .command-line { display: flex; align-items: center; color: var(--accent-green); margin-top: 10px; transition: color 0.5s; }
+        .prompt { margin-right: 10px; font-weight: bold; }
+        
+        #cmd-input {
+            background: transparent; border: none; color: #fff;
+            font-family: 'Fira Code', monospace; font-size: 0.95rem;
+            flex: 1; outline: none; caret-color: var(--accent-green);
+        }
+
+        /* ABOUT SECTION */
+        .about-section {
+            padding: 150px 5%; max-width: 1200px; margin: 0 auto; 
+            min-height: 100vh; 
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        
+        .about-container {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .section-title { font-family: 'Krona One', sans-serif; font-size: 2rem; margin-bottom: 40px; color: #fff; border-left: 4px solid var(--accent-green); padding-left: 20px; cursor: pointer; transition: border-color 0.5s; }
+        .about-text { font-size: 1.1rem; line-height: 1.8; color: #ccc; margin-bottom: 20px; }
+
+        /* --- HACKER PORTRAIT STYLES --- */
+        .profile-card {
+            position: relative;
+            width: 320px; height: 380px;
+            margin: 0 auto;
+        }
+
+        .profile-frame {
+            position: relative;
+            width: 100%; height: 100%;
+            clip-path: polygon(15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%, 0 15%);
+            background: #000;
+            padding: 4px; 
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.2);
+            transition: box-shadow 0.5s;
+        }
+
+        .profile-img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            background-image: url('images/photo.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: contrast(1.3) brightness(0.85) grayscale(0.2) hue-rotate(180deg);
+            clip-path: polygon(15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%, 0 15%);
+        }
+
+        .glitch-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('images/photo.jpg');
+            background-size: cover; background-position: center;
+            mix-blend-mode: hard-light;
+            opacity: 0.4;
+            clip-path: polygon(15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%, 0 15%);
+            animation: glitch-anim 4s infinite reverse;
+            pointer-events: none;
+        }
+
+        .hud-overlay {
+            position: absolute; bottom: 20px; left: 20px;
+            font-family: 'Fira Code', monospace; z-index: 10;
+        }
+
+        .hud-text {
+            display: block; color: #fff; font-size: 0.8rem; letter-spacing: 2px;
+            text-shadow: 0 0 5px rgba(0,255,0,0.8);
+        }
+
+        .hud-status {
+            display: block; color: var(--accent-green); font-size: 0.7rem; margin-top: 5px;
+            animation: blink 2s infinite;
+            transition: color 0.5s;
+        }
+
+        @keyframes glitch-anim {
+            0% { transform: translate(0); filter: hue-rotate(0deg); }
+            10% { transform: translate(-2px, 1px); filter: hue-rotate(90deg); }
+            20% { transform: translate(2px, -1px); filter: hue-rotate(0deg); }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .location-badge {
+            margin-top: 20px;
+            text-align: center;
+            font-family: 'Fira Code', monospace;
+            color: #888;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .location-badge i { color: var(--accent-orange); }
+
+
+        /* Skills */
+        .spread-section { height: 300vh; position: relative; }
+        .sticky-wrapper { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; perspective: 1000px; }
+        .spread-header { position: absolute; top: 15%; text-align: center; opacity: 0; z-index: 20; }
+        .spread-header h2 { font-size: 2.5rem; margin-bottom: 10px; cursor: pointer; }
+        .cards-container { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+        .card { width: 260px; height: 340px; background-color: var(--card-bg); border-radius: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 20px 50px rgba(0,0,0,0.9); border: 1px solid var(--card-border); display: flex; flex-direction: column; overflow: hidden; will-change: transform; transition: border-color 0.3s; }
+        .card:hover { border-color: #fff; z-index: 100 !important; }
+        .card-header { padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        .card-icon { color: var(--accent-green); font-size: 1.2rem; transition: color 0.5s; }
+        .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .card h3 { margin: 0 0 10px 0; font-size: 1.2rem; color: #fff; }
+        .card p { color: #888; font-size: 0.9rem; line-height: 1.4; }
+        .card:nth-child(1) { border-top: 3px solid var(--accent-green); z-index: 1; }
+        .card:nth-child(2) { border-top: 3px solid var(--accent-cyan); z-index: 2; }
+        .card:nth-child(3) { border-top: 3px solid var(--accent-orange); z-index: 3; }
+        .card:nth-child(4) { border-top: 3px solid #fff; z-index: 10; }
+        .card:nth-child(5) { border-top: 3px solid var(--accent-green); z-index: 3; }
+        .card:nth-child(6) { border-top: 3px solid var(--accent-cyan); z-index: 2; }
+        .card:nth-child(7) { border-top: 3px solid var(--accent-orange); z-index: 1; }
+
+        /* Projects */
+        .projects-wrapper { padding: 100px 5%; background: #080808; }
+        .stack-area { display: flex; flex-direction: column; align-items: center; position: relative; padding-bottom: 200px; }
+        .stack-card { 
+            width: 100%; max-width: 900px; min-height: 450px; 
+            background: #0f0f0f; border: 1px solid #222; border-radius: 20px; 
+            display: flex; overflow: hidden; position: sticky; top: 150px; 
+            margin-bottom: 80px; box-shadow: 0 -20px 60px rgba(0,0,0,0.6); 
+            transform-origin: top center; 
+            margin-left: auto; margin-right: 0;
+        }
+        .stack-content { flex: 1; padding: 50px; display: flex; flex-direction: column; justify-content: center; }
+        .stack-content h3 { font-size: 2rem; margin-bottom: 20px; color: #fff; font-family: 'Krona One', sans-serif; }
+        .stack-content p { color: #aaa; font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px; }
+        .tech-stack { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 30px; }
+        .tech-badge { padding: 6px 12px; background: rgba(255,255,255,0.05); border: 1px solid #333; border-radius: 4px; font-size: 0.8rem; font-family: 'Fira Code'; }
+        .stack-preview { flex: 1; background: #151515; position: relative; display: flex; align-items: center; justify-content: center; border-left: 1px solid #222; }
+        .stack-preview i { font-size: 5rem; color: #333; }
+        .stack-card:nth-child(1) { border-top: 2px solid var(--accent-orange); }
+        .stack-card:nth-child(2) { border-top: 2px solid var(--accent-cyan); }
+        .stack-card:nth-child(3) { border-top: 2px solid var(--accent-green); }
+        .stack-card:nth-child(4) { border-top: 2px solid #fff; }
+
+        /* Credentials */
+        .cert-section { padding: 100px 5%; max-width: 1200px; margin: 0 auto; text-align: center; }
+        .cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 50px; }
+        .cert-card { background: #111; padding: 30px; border: 1px solid #222; border-radius: 8px; transition: transform 0.3s; }
+        .cert-card:hover { transform: translateY(-5px); border-color: var(--accent-green); }
+        .cert-card h4 { color: #fff; margin-bottom: 10px; font-size: 1.2rem; }
+        .cert-card span { color: #666; font-size: 0.9rem; display: block; margin-top: 5px; }
+
+        /* Footer */
+        .footer { padding: 80px 5% 40px; background: #000; text-align: center; border-top: 1px solid #111; }
+        .social-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; }
+        .social-links a { color: #666; font-size: 1.5rem; transition: color 0.3s; }
+        .social-links a:hover { color: #fff; }
+        .contact-info p { color: #666; margin-bottom: 10px; }
+        .contact-info a { color: #fff; text-decoration: none; }
+
+        @media (max-width: 1100px) {
+            .hero-container { grid-template-columns: 1fr; gap: 2rem; text-align: center; }
+            .hero-content { text-align: center; order: 1; }
+            .terminal-window { order: 2; height: 300px; }
+            .hero-btns { justify-content: center; }
+            .hero-desc { margin: 0 auto 30px auto; }
+            
+            .drone-wrapper { display: none; }
+            .about-container { grid-template-columns: 1fr; text-align: center; }
+            .section-title { border-left: none; border-bottom: 4px solid var(--accent-green); display: inline-block; padding-bottom: 10px; padding-left: 0; }
+            .stack-card { margin: 0 auto 60px auto; flex-direction: column; height: auto; }
+            .stack-preview { height: 200px; border-left: none; border-bottom: 1px solid #222; }
+            .stack-content { padding: 40px 20px; }
+            .cards-container { transform: scale(0.65); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <div class="status-dot"></div>
+                SENURA.ROOT
+            </a>
+            <ul class="nav-links">
+                <!-- ADDED PLAY AREA LINK -->
+                <li><a href="playarea/index.html" style="color: var(--accent-orange); text-shadow: 0 0 10px rgba(254, 137, 29, 0.4);"><i class="fas fa-gamepad"></i> PLAY AREA</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#projects">Work</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- DRONE CHARACTER -->
+    <div class="drone-wrapper" id="drone">
+        <div class="drone-label">SYSTEM READY</div>
+        <div class="drone-core"><i class="fas fa-eye"></i></div>
+        <div class="drone-ring ring-1"></div>
+        <div class="drone-ring ring-2"></div>
+    </div>
+
+    <!-- HERO WITH TWO-COLUMN LAYOUT -->
+    <section class="hero" id="home">
+        <div class="hero-container">
+            
+            <!-- LEFT COLUMN: MAIN TEXT -->
+            <div class="hero-content">
+                <div class="terminal-text">user@senura:~$ ACCESS GRANTED</div>
+                <h1>
+                    <span class="highlight-green">OFFENSIVE</span> MINDSET.<br>
+                    <span class="highlight-cyan">DEFENSIVE</span> STRATEGY.
+                </h1>
+                <p class="hero-desc">"Securing the digital frontier, one packet at a time."</p>
+                
+                <div class="hero-btns">
+                    <a href="#projects" class="btn btn-primary">View Projects</a>
+                    <a href="#contact" class="btn btn-outline">Contact Me</a>
+                </div>
+                
+                <!-- NEW WARZONE BUTTON -->
+                <div style="margin-top: 20px;">
+                    <a href="playarea/index.html" class="btn" style="border: 1px dashed var(--accent-orange); color: var(--accent-orange); background: rgba(254, 137, 29, 0.1); width: 100%; text-align: center; display: block; transition: all 0.3s;">
+                        <i class="fas fa-biohazard"></i> ENTER CTF WARZONE
+                    </a>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: INTERACTIVE TERMINAL -->
+            <div class="terminal-wrapper">
+                <!-- NEW HINT ALERT -->
+                <div class="terminal-alert">
+                    <i class="fas fa-gift" style="color: var(--accent-orange);"></i>
+                    <span>SYSTEM ALERT: A hidden CTF challenge is active. Solve it for a surprise!</span>
+                </div>
+                
+                <div class="terminal-window" onclick="document.getElementById('cmd-input').focus()">
+                    <div class="terminal-header">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="terminal-output" id="terminal-output">
+                        <div>Welcome to SenuraOS v1.0</div>
+                        <div>Type 'help' to view available commands.</div>
+                        <br>
+                    </div>
+                    <div class="command-line">
+                        <span class="prompt" id="prompt-text">user@senura:~$</span>
+                        <input type="text" id="cmd-input" autocomplete="off" spellcheck="false">
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section class="about-section" id="about">
+        <h2 class="section-title" data-value="MISSION BRIEF">MISSION BRIEF</h2>
+        
+        <div class="about-container">
+            <!-- Text Content -->
+            <div class="about-content">
+                <div class="about-text">
+                    <p>I'm Senura De Silva, a 21-year-old cybersecurity enthusiast and second-year student at NIBM, specializing in Network Engineering and Ethical Hacking. My journey began with a deep curiosity about how systems communicate—and how they can be exploited or defended.</p>
+                </div>
+                <div class="about-text">
+                    <p>I'm passionate about exploring both offensive and defensive security—from penetration testing and network hardening to incident response. I believe that to build secure systems, one must first learn how to break them.</p>
+                </div>
+                <div class="about-text">
+                    <p>Beyond academics, I'm an active CTF player, pushing myself to discover new vulnerabilities. When I'm not buried in code, I love designing clean, minimal UIs—merging technology, security, and creativity.</p>
+                </div>
+            </div>
+
+            <!-- Portrait Column -->
+            <div class="about-visual">
+                <div class="profile-card">
+                    <div class="profile-frame">
+                        <div class="profile-img"></div>
+                        <div class="glitch-layer"></div>
+                        <div class="hud-overlay">
+                            <span class="hud-text">TARGET: SENURA.D</span>
+                            <span class="hud-status">STATUS: ONLINE</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="location-badge">
+                    <i class="fas fa-map-marker-alt"></i> Colombo, Sri Lanka
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SKILLS SPREAD -->
+    <section class="spread-section" id="skills">
+        <div class="sticky-wrapper">
+            <div class="spread-header">
+                <h2 data-value="SKILL ARSENAL">SKILL ARSENAL</h2>
+                <p>Scroll to deploy toolset</p>
+            </div>
+            
+            <div class="cards-container">
+                <div class="card"><div class="card-header"><i class="fas fa-network-wired card-icon"></i></div><div class="card-body"><h3>Network Security</h3><p>VLANs, VPNs, IDS/IPS, Squid Proxy</p></div></div>
+                <div class="card"><div class="card-header"><i class="fas fa-user-secret card-icon"></i></div><div class="card-body"><h3>Ethical Hacking</h3><p>Penetration Testing, Red Teaming</p></div></div>
+                <div class="card"><div class="card-header"><i class="fab fa-linux card-icon"></i></div><div class="card-body"><h3>Linux Ops</h3><p>CentOS, Bash Scripting, System Hardening</p></div></div>
+                <div class="card"><div class="card-header"><i class="fas fa-shield-halved card-icon" style="color: #fff;"></i></div><div class="card-body"><h3>Certified</h3><p>CEH v13 (Theory), RHCSA</p></div></div>
+                <div class="card"><div class="card-header"><i class="fab fa-python card-icon"></i></div><div class="card-body"><h3>Scripting</h3><p>Python, Automation, Tool Dev</p></div></div>
+                <div class="card"><div class="card-header"><i class="fas fa-microchip card-icon"></i></div><div class="card-body"><h3>Hardware</h3><p>Arduino, ESP32, IoT Security</p></div></div>
+                <div class="card"><div class="card-header"><i class="fas fa-database card-icon"></i></div><div class="card-body"><h3>Data/Web</h3><p>MySQL, Web App Security, Log Analysis</p></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROJECTS STACK -->
+    <section class="projects-wrapper" id="projects">
+        <div class="about-section" style="padding-bottom: 50px;">
+            <h2 class="section-title" data-value="OPERATIONAL LOGS">OPERATIONAL LOGS</h2>
+        </div>
+        
+        <div class="stack-area">
+            <!-- Project 1 -->
+            <div class="stack-card">
+                <div class="stack-content">
+                    <h3>Phishing Simulation</h3>
+                    <p>A complete ethical phishing campaign executed within a controlled lab. Included campaign planning, payload-free landing pages, and credential-harvesting simulations.</p>
+                    <div class="tech-stack"><span class="tech-badge">Social Engineering</span><span class="tech-badge">Reporting</span><span class="tech-badge">Threat Analysis</span></div>
+                </div>
+                <div class="stack-preview"><i class="fas fa-envelope-open-text"></i></div>
+            </div>
+            <!-- Project 2 -->
+            <div class="stack-card">
+                <div class="stack-content">
+                    <h3>Enterprise Network</h3>
+                    <p>A fully functional medium-scale company network designed with real enterprise-grade routers and firewalls. Features VLAN segmentation, routing, VPN, and centralized monitoring.</p>
+                    <div class="tech-stack"><span class="tech-badge">Cisco</span><span class="tech-badge">VLAN</span><span class="tech-badge">VPN</span><span class="tech-badge">IDS/IPS</span></div>
+                </div>
+                <div class="stack-preview"><i class="fas fa-server"></i></div>
+            </div>
+            <!-- Project 3 -->
+            <div class="stack-card">
+                <div class="stack-content">
+                    <h3>Malware Analysis Lab</h3>
+                    <p>Dedicated environment for static and dynamic analysis of malicious software. Configured with isolated VMs and sandboxing tools to study malware behavior and IOC extraction.</p>
+                    <div class="tech-stack"><span class="tech-badge">Virtualization</span><span class="tech-badge">Sandboxing</span><span class="tech-badge">Reverse Engineering</span></div>
+                </div>
+                <div class="stack-preview"><i class="fas fa-bug"></i></div>
+            </div>
+             <!-- Project 4 -->
+             <div class="stack-card">
+                <div class="stack-content">
+                    <h3>Multi-OS Org System</h3>
+                    <p>Integrated IT infrastructure combining Windows AD and Linux DNS/DHCP services. Demonstrates cross-platform authentication, automation, and secure service integration.</p>
+                    <div class="tech-stack"><span class="tech-badge">Active Directory</span><span class="tech-badge">Linux</span><span class="tech-badge">Automation</span></div>
+                </div>
+                <div class="stack-preview"><i class="fab fa-linux"></i></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CERTIFICATES -->
+    <section class="cert-section">
+        <h2 class="section-title" style="border:none; padding:0; text-align:center;" data-value="CREDENTIALS">CREDENTIALS</h2>
+        <div class="cert-grid">
+            <div class="cert-card" style="border-color: var(--accent-green); box-shadow: 0 0 15px rgba(0,255,65,0.1);">
+                <h4>CEH v13</h4>
+                <span style="color: var(--accent-green); font-size: 0.95rem; font-weight: 500;"><i class="fas fa-check-circle"></i> Exam Completed</span>
+            </div>
+            <div class="cert-card">
+                <h4>CEH v13 Practical</h4>
+                <span class="status-dot" style="display:inline-block; margin-right:5px; background-color: var(--accent-orange); box-shadow: 0 0 10px var(--accent-orange);"></span>
+                <span>In Progress</span>
+            </div>
+            <div class="cert-card">
+                <h4>RHCSA</h4>
+                 <span class="status-dot" style="display:inline-block; margin-right:5px; background-color: var(--accent-orange); box-shadow: 0 0 10px var(--accent-orange);"></span>
+                 <span>In Progress</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer" id="contact">
+        <div class="social-links">
+            <a href="https://www.linkedin.com/your-profile"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <div class="contact-info">
+            <p>Colombo, Sri Lanka</p>
+            <p><a href="mailto:senurasilva21@gmail.com">senurasilva21@gmail.com</a></p>
+            <p>+94 71 577 3185</p>
+        </div>
+        <p style="margin-top: 40px; color: #444; font-size: 0.8rem;">&copy; 2025 Senura De Silva. All Rights Reserved.</p>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+
+    <script>
+        // 1. Smooth Scroll
+        const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), direction: 'vertical', smooth: true, wheelMultiplier: 1, touchMultiplier: 2 });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        requestAnimationFrame(raf);
+
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- INTELLIGENT DRONE ANIMATION ---
+        const drone = document.querySelector("#drone");
+        const droneLabel = document.querySelector(".drone-label");
+        
+        function flyTo(xPercent, yPercent, text, scale = 1) {
+            gsap.to(drone, {
+                left: xPercent + "%",
+                top: yPercent + "%",
+                scale: scale,
+                duration: 1.8,
+                ease: "power2.inOut"
+            });
+            gsap.to(droneLabel, { opacity: 0, duration: 0.2, onComplete: () => {
+                droneLabel.innerText = text;
+                gsap.to(droneLabel, { opacity: 0.8, duration: 0.2 });
+            }});
+        }
+
+        flyTo(90, 15, "SYSTEM READY", 1);
+
+        ScrollTrigger.create({
+            trigger: "#about",
+            start: "top center",
+            onEnter: () => flyTo(92, 50, "ANALYZING...", 1),
+            onLeaveBack: () => flyTo(90, 15, "SYSTEM READY", 1)
+        });
+
+        ScrollTrigger.create({
+            trigger: ".spread-section",
+            start: "top center",
+            onEnter: () => flyTo(10, 20, "DECRYPTING...", 0.9),
+            onLeaveBack: () => flyTo(92, 50, "ANALYZING...", 1)
+        });
+
+        ScrollTrigger.create({
+            trigger: ".projects-wrapper",
+            start: "top center",
+            onEnter: () => flyTo(8, 50, "LOGGING...", 1),
+            onLeaveBack: () => flyTo(10, 20, "DECRYPTING...", 0.9)
+        });
+
+        ScrollTrigger.create({
+            trigger: ".footer",
+            start: "top bottom",
+            onEnter: () => flyTo(90, 80, "SECURE", 1),
+            onLeaveBack: () => flyTo(8, 50, "LOGGING...", 1)
+        });
+
+        // --- STANDARD ANIMATIONS ---
+        const heroTl = gsap.timeline();
+        
+        heroTl.from(".hero-content", { x: -50, opacity: 0, duration: 1, ease: "power3.out" })
+              .from(".terminal-wrapper", { x: 50, opacity: 0, duration: 1, ease: "power3.out" }, "-=0.8");
+
+        const cards = document.querySelectorAll('.card');
+        const spreadHeader = document.querySelector('.spread-header');
+        const spreadConfig = [
+            { x: -390, y: 0, r: 0 }, { x: -260, y: 0, r: 0 }, { x: -130, y: 0, r: 0 },
+            { x: 0, y: 0, r: 0 },
+            { x: 130, y: 0, r: 0 }, { x: 260, y: 0, r: 0 }, { x: 390, y: 0, r: 0 }
+        ];
+
+        let spreadTl = gsap.timeline({
+            scrollTrigger: { trigger: ".spread-section", start: "top top", end: "bottom bottom", scrub: 1, pin: ".sticky-wrapper" }
+        });
+
+        spreadTl.to(spreadHeader, { opacity: 1, duration: 0.5 })
+                .to(cards, { x: (i) => spreadConfig[i].x, y: (i) => spreadConfig[i].y, rotation: (i) => spreadConfig[i].r, duration: 2, ease: "power2.out" }, "<")
+                .to({}, { duration: 1 });
+
+        const stackCards = document.querySelectorAll('.stack-card');
+        stackCards.forEach((card, i) => {
+            gsap.to(card, {
+                scale: 1 - (stackCards.length - i) * 0.05, opacity: i === stackCards.length - 1 ? 1 : 0.6,
+                scrollTrigger: { trigger: card, start: "top 150px", end: "bottom top", scrub: true }
+            });
+        });
+
+        // --- SECURITY SCRIPTS (MODIFIED FOR TERMINAL COPY/PASTE) ---
+        
+        document.addEventListener('contextmenu', e => {
+            if (e.target.closest('.terminal-window')) {
+                return; // Allow right-click inside terminal
+            }
+            e.preventDefault(); // Block everywhere else
+        });
+
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+        }
+
+        console.log("%cSTOP!", "color: red; font-size: 50px; font-weight: bold; text-shadow: 2px 2px #000;");
+        console.log("%cThis area is for developers only. If you were told to paste something here, it is a scam.", "color: white; font-size: 16px;");
+
+        // --- HACKER TEXT DECODE EFFECT ---
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
+
+        document.querySelectorAll("h2, h3").forEach(element => {
+            element.dataset.value = element.innerText;
+            
+            element.onmouseover = event => {
+                let iterations = 0;
+                const interval = setInterval(() => {
+                    event.target.innerText = event.target.innerText
+                        .split("")
+                        .map((letter, index) => {
+                            if(index < iterations) {
+                                return event.target.dataset.value[index];
+                            }
+                            return letters[Math.floor(Math.random() * letters.length)];
+                        })
+                        .join("");
+
+                    if(iterations >= event.target.dataset.value.length){ 
+                        clearInterval(interval);
+                    }
+                    
+                    iterations += 1 / 3;
+                }, 30);
+            }
+        });
+
+        // --- ADVANCED TERMINAL WITH CRYPTOGRAPHY CTF ---
+        const inputField = document.getElementById('cmd-input');
+        const outputDiv = document.getElementById('terminal-output');
+        const terminalWindow = document.querySelector('.terminal-window');
+        const promptText = document.getElementById('prompt-text');
+        
+        let currentUser = "senura";
+        let currentPath = "~";
+        let waitingForPassword = false;
+        
+        // Helper: Base64 Decode
+        function base64Decode(str) {
+            try { return atob(str); } catch(e) { return "[Invalid Base64]"; }
+        }
+        
+        // Helper: ROT13
+        function rot13(str) {
+            return str.replace(/[a-zA-Z]/g, function(c){
+                return String.fromCharCode((c <= "Z" ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26);
+            });
+        }
+        
+        // Simulated File System
+        const fileSystem = {
+            "~": {
+                files: ["readme.txt", "skills.txt"],
+                dirs: ["projects", ".shadows"]
+            },
+            "~/projects": {
+                files: ["network_scan.log", "exploit.py"],
+                dirs: []
+            },
+            "~/.shadows": {
+                files: ["cipher.txt"],
+                dirs: []
+            }
+        };
+
+        // File Contents (STORY BASED HINTS)
+        const fileContents = {
+            "readme.txt": "Welcome to the system.\n\nStory: The previous admin was brilliant but careless. He hid his secrets in the shadows, but he had a sticky 'G' key on his keyboard, so he often typed 'I' instead.\n\nCheck the dark corners of the file system to find what he left behind.",
+            "skills.txt": "CEH, Network Security, Linux, Python, Web Application Security",
+            "network_scan.log": "192.168.1.1 - Open Ports: 22, 80, 443\n192.168.1.2 - Open Ports: 21, 22",
+            "exploit.py": "# Python exploit script\nimport socket\n# [Redacted for security]",
+            "cipher.txt": "Gur frperg vf: synv{pelcgb_znfgre_2025}\n\n[Encrypted with ROT13]"
+        };
+
+        inputField.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const command = inputField.value.trim();
+                if(command || waitingForPassword) {
+                    processCommand(command);
+                    inputField.value = '';
+                }
+            }
+        });
+
+        function processCommand(cmd) {
+            const cmdLine = document.createElement('div');
+            
+            if(!waitingForPassword) {
+                 // DYNAMIC PROMPT COLOR
+                 const userColor = currentUser === "root" ? "#FFD700" : "var(--accent-green)";
+                 cmdLine.innerHTML = `<span style="color:${userColor}; font-weight:bold; margin-right:8px;">${currentUser}@senura:${currentPath}$</span>${cmd}`;
+                 outputDiv.appendChild(cmdLine);
+            }
+
+            let response = '';
+            
+            if(waitingForPassword) {
+                if(cmd === 'senura') {
+                    response = "Nice try. Hacking yourself is not allowed.";
+                } else {
+                    response = "Access denied.";
+                }
+                waitingForPassword = false; 
+            } else {
+                const parts = cmd.split(" ");
+                const mainCmd = parts[0].toLowerCase();
+                const arg = parts.slice(1).join(" ");
+
+                switch(mainCmd) {
+                    case 'help':
+                        response = "Available commands:\n- ls [-la]: List files\n- cd <dir>: Change directory\n- cat <file>: Read file\n- decode <base64>: Decode Base64\n- rot13 <text>: Decrypt ROT13\n- submit <flag>: Submit CTF flag\n- clear, whoami, su -";
+                        break;
+                    
+                    case 'ls':
+                        if(arg === '-a' || arg === '-la') {
+                            const allContent = [...fileSystem[currentPath].dirs, ...fileSystem[currentPath].files];
+                             response = allContent.join("  ");
+                        } else {
+                            const visibleDirs = fileSystem[currentPath].dirs.filter(d => !d.startsWith('.'));
+                            const visibleFiles = fileSystem[currentPath].files.filter(f => !f.startsWith('.'));
+                            response = [...visibleDirs, ...visibleFiles].join("  ");
+                        }
+                        if(response === "") response = "(empty)";
+                        break;
+
+                    case 'cd':
+                        if(!arg || arg === "~") {
+                            currentPath = "~";
+                        } else if (arg === "..") {
+                            currentPath = "~"; 
+                        } else {
+                            if(fileSystem[currentPath].dirs.includes(arg)) {
+                                currentPath = currentPath === "~" ? `~/${arg}` : `${currentPath}/${arg}`;
+                            } else {
+                                response = `bash: cd: ${arg}: No such file or directory`;
+                            }
+                        }
+                        break;
+
+                    case 'cat':
+                        if(!arg) {
+                            response = "Usage: cat <filename>";
+                        } else {
+                            if(fileSystem[currentPath].files.includes(arg)) {
+                                response = fileContents[arg] || "[Binary Data]";
+                            } else {
+                                response = `cat: ${arg}: No such file or directory`;
+                            }
+                        }
+                        break;
+
+                    // --- CRYPTOGRAPHY TOOLS ---
+                    case 'decode':
+                        if(!arg) {
+                            response = "Usage: decode <base64_string>";
+                        } else {
+                            response = "Decoded: " + base64Decode(arg);
+                        }
+                        break;
+
+                    case 'rot13':
+                        if(!arg) {
+                            response = "Usage: rot13 <encrypted_text>";
+                        } else {
+                            response = "Decrypted: " + rot13(arg);
+                        }
+                        break;
+
+                    case 'whoami':
+                        response = currentUser;
+                        break;
+                    case 'clear':
+                        outputDiv.innerHTML = '';
+                        return;
+                    case 'su':
+                        if(arg === '-') {
+                            response = "Password:";
+                            waitingForPassword = true;
+                        } else {
+                             response = "Usage: su -";
+                        }
+                        break;
+                    case 'sudo':
+                         response = "User is not in the sudoers file. This incident will be reported.";
+                         break;
+                    
+                    // --- CTF SUBMISSION ---
+                    case 'submit':
+                        if(arg === 'flag{crypto_master_2025}') {
+                            // --- VICTORY SEQUENCE ---
+                            response = "🎉 CORRECT FLAG IDENTIFIED.\n\n[SYSTEM OVERRIDE INITIATED]...\nACCESS LEVEL: GOD MODE.";
+                            
+                            // 1. Flash Screen & Change Variables
+                            document.body.classList.add('root-access');
+                            
+                            // 2. Change Prompt
+                            currentUser = "root";
+                            promptText.innerHTML = "root@senura:~$";
+                            promptText.style.color = "#FFD700";
+                            inputField.style.caretColor = "#FFD700";
+                            
+                            // 3. Update Text Content
+                            document.querySelector('.terminal-text').innerHTML = "root@senura:~$ GOD MODE ACTIVE";
+                            document.querySelector('.terminal-text').style.borderColor = "#FFD700";
+                            document.querySelector('.terminal-text').style.color = "#FFD700";
+                            document.querySelector('.terminal-text').style.backgroundColor = "rgba(255, 215, 0, 0.1)";
+
+                        } else if(arg === 'flai{crypto_master_2025}') {
+                            response = "⚠️ Close! Remember the story about the admin's sticky key? He types 'I' instead of 'G'. Fix the typo.";
+                        } else {
+                            response = "❌ Incorrect flag. Keep digging.";
+                        }
+                        break;
+
+                    default:
+                        response = `Command not found: ${mainCmd}. Type 'help' for available commands.`;
+                }
+            }
+
+            const respLine = document.createElement('div');
+            respLine.style.color = '#ccc';
+            respLine.style.marginBottom = '10px';
+            respLine.innerText = response;
+            outputDiv.appendChild(respLine);
+
+            terminalWindow.scrollTop = terminalWindow.scrollHeight;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SenuraOS Attack Console</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #000; color: #00ff41; font-family: 'Fira Code', monospace; margin: 0; padding: 20px; height: 100vh; overflow: hidden; font-size: 14px; }
+        #output { white-space: pre-wrap; margin-bottom: 20px; }
+        .input-line { display: flex; }
+        .prompt { color: #00ff41; font-weight: bold; margin-right: 10px; }
+        input { background: transparent; border: none; color: #fff; font-family: 'Fira Code'; font-size: 14px; flex: 1; outline: none; }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-thumb { background: #333; }
+    </style>
+</head>
+<body>
+    <div id="output">SenuraOS [Version 2.0.5] - ATTACK MODULE LOADED
+(c) 2025 Senura Cyber Security.
+
+Type 'help' for commands.
+Type 'ls' to see available target directories.
+</div>
+    <div class="input-line">
+        <span class="prompt" id="prompt-txt">attacker@senura:~$</span>
+        <input type="text" id="cmd" autofocus>
+    </div>
+
+    <script>
+        const cmdInput = document.getElementById('cmd');
+        const output = document.getElementById('output');
+        const promptTxt = document.getElementById('prompt-txt');
+        let currentDir = "~";
+
+        // VIRTUAL FILE SYSTEM FOR CHALLENGES
+        const fileSystem = {
+            "~": { dirs: ["easy_1", "med_3", "hard_2", "hard_3"], files: ["readme.txt"] },
+            "easy_1": { dirs: [], files: [".hidden_config", "public.txt"] },
+            "med_3": { dirs: [], files: ["user.txt", "root_script.sh"] },
+            "hard_2": { dirs: [], files: ["server.log", "error.log"] },
+            "hard_3": { dirs: [], files: ["vuln_program", "exploit.py"] }
+        };
+
+        const fileContents = {
+            "readme.txt": "Use this terminal to solve the Linux based challenges.",
+            ".hidden_config": "flag{hidden_files_are_easy}", // EASY 1
+            "root_script.sh": "#!/bin/bash\n# This script runs as root\necho 'Access Granted: flag{sudo_privileges_escalated}'", // MED 3
+            "server.log": "[INFO] User login: admin\n[ERROR] Failed login: guest\n[DEBUG] Flag generated: flag{grep_master_investigator}\n[INFO] Logout", // HARD 2
+            "exploit.py": "print('Buffer Overflow successful...')\nprint('Address: 0x41414141')\nprint('Root Shell Pop: flag{buffer_overflow_king}')" // HARD 3
+        };
+
+        cmdInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const rawCmd = this.value.trim();
+                const parts = rawCmd.split(" ");
+                const cmd = parts[0].toLowerCase();
+                const arg = parts[1];
+
+                output.innerHTML += `\n<span style="color:#fff">${promptTxt.innerText}</span> ${rawCmd}\n`;
+
+                // --- COMMAND LOGIC ---
+                if(cmd === 'help') {
+                    output.innerHTML += "Commands: ls, cd, cat, clear, whoami, decode, sudo, python, grep";
+                }
+                else if(cmd === 'clear') {
+                    output.innerHTML = "";
+                }
+                else if(cmd === 'ls') {
+                    if(currentDir === "~") output.innerHTML += "easy_1/  med_3/  hard_2/  hard_3/  readme.txt";
+                    else if(currentDir === "easy_1") {
+                        if(arg === "-a" || arg === "-la") output.innerHTML += ".hidden_config  public.txt";
+                        else output.innerHTML += "public.txt";
+                    }
+                    else if(fileSystem[currentDir]) {
+                        output.innerHTML += fileSystem[currentDir].files.join("  ");
+                    }
+                }
+                else if(cmd === 'cd') {
+                    if(arg === "..") { currentDir = "~"; promptTxt.innerText = "attacker@senura:~$"; }
+                    else if(fileSystem["~"].dirs.includes(arg)) {
+                        currentDir = arg;
+                        promptTxt.innerText = `attacker@senura:~/${arg}$`;
+                    } else {
+                        output.innerHTML += `bash: cd: ${arg}: No such directory`;
+                    }
+                }
+                else if(cmd === 'cat') {
+                    if(fileContents[arg]) output.innerHTML += fileContents[arg];
+                    else output.innerHTML += `cat: ${arg}: No such file`;
+                }
+                else if(cmd === 'decode') { // EASY 2
+                    try { output.innerHTML += atob(arg); } catch(e) { output.innerHTML += "Invalid Base64"; }
+                }
+                else if(cmd === 'sudo') { // MED 3
+                    if(arg === "./root_script.sh" && currentDir === "med_3") {
+                         output.innerHTML += fileContents["root_script.sh"];
+                    } else if(arg === "-l") {
+                        output.innerHTML += "User attacker may run the following commands on senura:\n    (root) NOPASSWD: /home/attacker/med_3/root_script.sh";
+                    } else {
+                        output.innerHTML += "Sorry, user attacker is not allowed to execute this as root.";
+                    }
+                }
+                else if(cmd === 'grep') { // HARD 2
+                    if(arg.includes("flag") && parts[2] === "server.log") {
+                         output.innerHTML += "[DEBUG] Flag generated: flag{grep_master_investigator}";
+                    } else {
+                        output.innerHTML += "Usage: grep <term> <file>";
+                    }
+                }
+                else if(cmd === 'python' || cmd === 'python3') { // HARD 3
+                    if(arg === "exploit.py" && currentDir === "hard_3") {
+                        output.innerHTML += fileContents["exploit.py"];
+                    }
+                }
+                else {
+                    output.innerHTML += `bash: ${cmd}: command not found`;
+                }
+
+                this.value = '';
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+        });
+    </script>
+</body>
+</html>

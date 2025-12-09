@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Senura.Root | CTF Operations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Krona+One&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body { background-color: #050505; color: #fff; font-family: 'Fira Code', monospace; margin: 0; padding: 20px; }
+        .navbar { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 40px; }
+        .logo { font-family: 'Krona One'; color: #fff; text-decoration: none; font-size: 1.2rem; }
+        .back { color: #888; text-decoration: none; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
+        .card { background: #0f0f0f; border: 1px solid #333; padding: 30px; border-radius: 8px; transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); border-color: #fff; }
+        .easy { border-top: 3px solid #00ff41; }
+        .med { border-top: 3px solid #0ff; }
+        .hard { border-top: 3px solid #ff3333; }
+        h2 { margin-top: 0; }
+        .link-list a { display: block; padding: 10px; border-bottom: 1px solid #222; color: #aaa; text-decoration: none; transition: 0.3s; }
+        .link-list a:hover { color: #fff; padding-left: 10px; background: rgba(255,255,255,0.05); }
+        .float-btn { position: fixed; bottom: 30px; right: 30px; background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 15px 25px; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 10px; z-index: 100; font-weight: bold; }
+        .float-btn:hover { background: #00ff41; color: #000; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="../index.html" class="logo">SENURA.ROOT // WARZONE</a>
+        <a href="../index.html" class="back">Exit to Main System</a>
+    </nav>
+
+    <div class="grid">
+        <!-- EASY -->
+        <div class="card easy">
+            <h2 style="color: #00ff41;">LEVEL 1: ROOKIE</h2>
+            <div class="link-list">
+                <a href="challenges/easy-1.html">01. Linux: Hidden Files</a>
+                <a href="challenges/easy-2.html">02. Crypto: Base64</a>
+                <a href="challenges/easy-3.html">03. Web: Source Code</a>
+            </div>
+        </div>
+        <!-- MEDIUM -->
+        <div class="card med">
+            <h2 style="color: #0ff;">LEVEL 2: SOLDIER</h2>
+            <div class="link-list">
+                <a href="challenges/med-1.html">01. Web: Cookie Theft</a>
+                <a href="challenges/med-2.html">02. Web: SQL Injection</a>
+                <a href="challenges/med-3.html">03. Linux: Sudo Rights</a>
+            </div>
+        </div>
+        <!-- HARD -->
+        <div class="card hard">
+            <h2 style="color: #ff3333;">LEVEL 3: ELITE</h2>
+            <div class="link-list">
+                <a href="challenges/hard-1.html">01. Web: XSS Payload</a>
+                <a href="challenges/hard-2.html">02. Linux: Log Forensics</a>
+                <a href="challenges/hard-3.html">03. Exploit: Buffer Overflow</a>
+            </div>
+        </div>
+    </div>
+
+    <a href="terminal.html" target="_blank" class="float-btn">
+        <i class="fas fa-terminal"></i> OPEN ATTACK TERMINAL
+    </a>
+</body>
+</html>

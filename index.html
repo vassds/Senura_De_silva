@@ -28,6 +28,7 @@
             --accent-orange: #FE891D;
             --card-bg: #0f0f0f;
             --card-border: #222;
+            --terminal-glow: rgba(0, 255, 65, 0.05);
         }
 
         html { height: auto; width: 100%; overflow-x: hidden; }
@@ -38,11 +39,25 @@
             font-family: 'DM Sans', sans-serif;
             width: 100%;
             overflow-x: hidden;
+            transition: all 0.5s ease;
             
-            /* SECURITY: Disable Text Selection */
+            /* SECURITY: Disable Text Selection Globally */
             -webkit-user-select: none;
             -ms-user-select: none;
             user-select: none;
+        }
+
+        /* --- ROOT ACCESS ANIMATION CLASSES --- */
+        body.root-access {
+            --accent-green: #FFD700; /* GOLD */
+            --terminal-glow: rgba(255, 215, 0, 0.3);
+            animation: rootFlash 1s ease-out;
+        }
+        
+        @keyframes rootFlash {
+            0% { background-color: #fff; }
+            10% { background-color: #FFD700; }
+            100% { background-color: #050505; }
         }
 
         /* --- 2. NAVBAR --- */
@@ -65,7 +80,7 @@
             text-decoration: none; display: flex; align-items: center; gap: 10px;
         }
         
-        .status-dot { width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 10px var(--accent-green); }
+        .status-dot { width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 10px var(--accent-green); transition: background 0.5s, box-shadow 0.5s; }
         .nav-links { display: flex; gap: 2.5rem; list-style: none; }
         .nav-links a { color: #888; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.3s; }
         .nav-links a:hover { color: var(--accent-green); }
@@ -91,6 +106,7 @@
             box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
             display: flex; align-items: center; justify-content: center;
             z-index: 2;
+            transition: all 0.5s;
         }
 
         .drone-core i { font-size: 1.2rem; color: #fff; }
@@ -102,6 +118,7 @@
             border-radius: 50%;
             border: 1px dashed rgba(0, 255, 65, 0.5);
             animation: spin 10s linear infinite;
+            transition: border-color 0.5s;
         }
         .ring-1 { width: 60px; height: 60px; border-color: var(--accent-cyan); animation-duration: 8s; border-left-color: transparent; border-right-color: transparent; }
         .ring-2 { width: 75px; height: 75px; border-color: var(--accent-green); animation-duration: 12s; animation-direction: reverse; opacity: 0.5; border-top-color: transparent; }
@@ -118,7 +135,7 @@
             border-radius: 4px;
             border: 1px solid rgba(0, 255, 65, 0.3);
             opacity: 0.8;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s, color 0.5s, border-color 0.5s;
         }
 
         @keyframes spin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
@@ -129,16 +146,16 @@
         .hero {
             min-height: 100vh;
             display: flex;
-            align-items: center; /* Vertically center */
+            align-items: center;
             justify-content: center;
-            padding: 100px 5%; /* Add top padding for fixed nav */
+            padding: 100px 5%;
             position: relative;
             z-index: 10;
         }
 
         .hero-container {
             display: grid;
-            grid-template-columns: 1.2fr 1fr; /* Text Left, Terminal Right */
+            grid-template-columns: 1.2fr 1fr;
             gap: 4rem;
             width: 100%;
             max-width: 1400px;
@@ -155,22 +172,19 @@
             font-size: 1.1rem; margin-bottom: 20px; background: rgba(0, 255, 65, 0.1);
             padding: 8px 16px; border-radius: 4px; border: 1px solid rgba(0, 255, 65, 0.2);
             display: inline-block;
+            transition: color 0.5s, border-color 0.5s, background-color 0.5s;
         }
         
-        /* --- UPDATED TYPOGRAPHY: Smaller, White, Shadow --- */
         .hero h1 {
-            /* Smaller font size as requested */
             font-size: clamp(1.8rem, 3.5vw, 3.2rem); 
             line-height: 1.3; 
             margin-bottom: 1.5rem;
             font-weight: 700; 
             letter-spacing: 0.05em;
-            color: #fff; /* Pure White */
-            /* Gray Shadow */
+            color: #fff;
             text-shadow: 0px 0px 15px rgba(120, 120, 120, 0.6);
         }
         
-        /* Removed colors, made them white to match request */
         .highlight-green, .highlight-cyan {
             color: #fff;
         }
@@ -186,7 +200,7 @@
 
         .hero-btns { display: flex; gap: 20px; }
         .btn { padding: 12px 30px; border-radius: 4px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; font-family: 'Fira Code', monospace; }
-        .btn-primary { background: var(--accent-green); color: #000; }
+        .btn-primary { background: var(--accent-green); color: #000; transition: background 0.5s; }
         .btn-primary:hover { box-shadow: 0 0 20px rgba(0, 255, 65, 0.4); }
         .btn-outline { border: 1px solid #333; color: #fff; }
         .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.05); }
@@ -194,7 +208,7 @@
         /* INTERACTIVE TERMINAL CSS */
         .terminal-window {
             width: 100%; 
-            height: 400px; /* Taller for desktop */
+            height: 400px;
             background: rgba(10, 10, 10, 0.95);
             border: 1px solid #333;
             border-radius: 8px;
@@ -203,9 +217,22 @@
             font-family: 'Fira Code', monospace;
             font-size: 0.95rem;
             overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 255, 65, 0.05);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px var(--terminal-glow);
             display: flex; flex-direction: column;
             cursor: text;
+            transition: box-shadow 0.5s, border-color 0.5s;
+
+            /* ENABLE COPY/PASTE IN TERMINAL ONLY */
+            -webkit-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+        }
+
+        /* Ensure child elements also inherit selection ability */
+        .terminal-window * {
+            -webkit-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
         }
 
         .terminal-header {
@@ -218,7 +245,7 @@
         .green { background: #27c93f; }
 
         .terminal-output { flex: 1; color: #ccc; line-height: 1.6; white-space: pre-wrap; }
-        .command-line { display: flex; align-items: center; color: var(--accent-green); margin-top: 10px; }
+        .command-line { display: flex; align-items: center; color: var(--accent-green); margin-top: 10px; transition: color 0.5s; }
         .prompt { margin-right: 10px; font-weight: bold; }
         
         #cmd-input {
@@ -241,7 +268,7 @@
             align-items: center;
         }
 
-        .section-title { font-family: 'Krona One', sans-serif; font-size: 2rem; margin-bottom: 40px; color: #fff; border-left: 4px solid var(--accent-green); padding-left: 20px; cursor: pointer; }
+        .section-title { font-family: 'Krona One', sans-serif; font-size: 2rem; margin-bottom: 40px; color: #fff; border-left: 4px solid var(--accent-green); padding-left: 20px; cursor: pointer; transition: border-color 0.5s; }
         .about-text { font-size: 1.1rem; line-height: 1.8; color: #ccc; margin-bottom: 20px; }
 
         /* --- HACKER PORTRAIT STYLES --- */
@@ -258,18 +285,16 @@
             background: #000;
             padding: 4px; 
             box-shadow: 0 0 25px rgba(0, 255, 65, 0.2);
+            transition: box-shadow 0.5s;
         }
 
         .profile-img {
             width: 100%; height: 100%;
             object-fit: cover;
-            /* CHANGE FILE NAME HERE IF NEEDED */
             background-image: url('images/photo.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            
-            /* FILTER MAGIC: Makes your photo look like a hacker */
             filter: contrast(1.3) brightness(0.85) grayscale(0.2) hue-rotate(180deg);
             clip-path: polygon(15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%, 0 15%);
         }
@@ -298,6 +323,7 @@
         .hud-status {
             display: block; color: var(--accent-green); font-size: 0.7rem; margin-top: 5px;
             animation: blink 2s infinite;
+            transition: color 0.5s;
         }
 
         @keyframes glitch-anim {
@@ -328,7 +354,7 @@
         .card { width: 260px; height: 340px; background-color: var(--card-bg); border-radius: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 20px 50px rgba(0,0,0,0.9); border: 1px solid var(--card-border); display: flex; flex-direction: column; overflow: hidden; will-change: transform; transition: border-color 0.3s; }
         .card:hover { border-color: #fff; z-index: 100 !important; }
         .card-header { padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
-        .card-icon { color: var(--accent-green); font-size: 1.2rem; }
+        .card-icon { color: var(--accent-green); font-size: 1.2rem; transition: color 0.5s; }
         .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
         .card h3 { margin: 0 0 10px 0; font-size: 1.2rem; color: #fff; }
         .card p { color: #888; font-size: 0.9rem; line-height: 1.4; }
@@ -453,7 +479,7 @@
                     <br>
                 </div>
                 <div class="command-line">
-                    <span class="prompt">user@senura:~$</span>
+                    <span class="prompt" id="prompt-text">user@senura:~$</span>
                     <input type="text" id="cmd-input" autocomplete="off" spellcheck="false">
                 </div>
             </div>
@@ -469,17 +495,17 @@
             <!-- Text Content -->
             <div class="about-content">
                 <div class="about-text">
-                    <p>I’m Senura De Silva, a 21-year-old cybersecurity enthusiast and second-year student at NIBM, specializing in Network Engineering and Ethical Hacking. My journey began with a deep curiosity about how systems communicate—and how they can be exploited or defended.</p>
+                    <p>I'm Senura De Silva, a 21-year-old cybersecurity enthusiast and second-year student at NIBM, specializing in Network Engineering and Ethical Hacking. My journey began with a deep curiosity about how systems communicate—and how they can be exploited or defended.</p>
                 </div>
                 <div class="about-text">
-                    <p>I’m passionate about exploring both offensive and defensive security—from penetration testing and network hardening to incident response. I believe that to build secure systems, one must first learn how to break them.</p>
+                    <p>I'm passionate about exploring both offensive and defensive security—from penetration testing and network hardening to incident response. I believe that to build secure systems, one must first learn how to break them.</p>
                 </div>
                 <div class="about-text">
-                    <p>Beyond academics, I’m an active CTF player, pushing myself to discover new vulnerabilities. When I’m not buried in code, I love designing clean, minimal UIs—merging technology, security, and creativity.</p>
+                    <p>Beyond academics, I'm an active CTF player, pushing myself to discover new vulnerabilities. When I'm not buried in code, I love designing clean, minimal UIs—merging technology, security, and creativity.</p>
                 </div>
             </div>
 
-            <!-- Portrait Column (SECURE HACKER CARD) -->
+            <!-- Portrait Column -->
             <div class="about-visual">
                 <div class="profile-card">
                     <div class="profile-frame">
@@ -633,10 +659,8 @@
             }});
         }
 
-        // 1. Initial State
         flyTo(90, 15, "SYSTEM READY", 1);
 
-        // 2. About
         ScrollTrigger.create({
             trigger: "#about",
             start: "top center",
@@ -644,7 +668,6 @@
             onLeaveBack: () => flyTo(90, 15, "SYSTEM READY", 1)
         });
 
-        // 3. Skills
         ScrollTrigger.create({
             trigger: ".spread-section",
             start: "top center",
@@ -652,7 +675,6 @@
             onLeaveBack: () => flyTo(92, 50, "ANALYZING...", 1)
         });
 
-        // 4. Projects
         ScrollTrigger.create({
             trigger: ".projects-wrapper",
             start: "top center",
@@ -660,7 +682,6 @@
             onLeaveBack: () => flyTo(10, 20, "DECRYPTING...", 0.9)
         });
 
-        // 5. Footer
         ScrollTrigger.create({
             trigger: ".footer",
             start: "top bottom",
@@ -668,11 +689,9 @@
             onLeaveBack: () => flyTo(8, 50, "LOGGING...", 1)
         });
 
-
         // --- STANDARD ANIMATIONS ---
         const heroTl = gsap.timeline();
         
-        // Revised Animation Sequence for Split Layout
         heroTl.from(".hero-content", { x: -50, opacity: 0, duration: 1, ease: "power3.out" })
               .from(".terminal-window", { x: 50, opacity: 0, duration: 1, ease: "power3.out" }, "-=0.8");
 
@@ -700,29 +719,29 @@
             });
         });
 
-        // --- SECURITY SCRIPTS (DETERRENTS) ---
+        // --- SECURITY SCRIPTS (MODIFIED FOR TERMINAL COPY/PASTE) ---
         
-        // 1. Block Context Menu
-        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('contextmenu', e => {
+            if (e.target.closest('.terminal-window')) {
+                return; // Allow right-click inside terminal
+            }
+            e.preventDefault(); // Block everywhere else
+        });
 
-        // 2. Block Shortcuts
         document.onkeydown = function(e) {
-            if(e.keyCode == 123) return false; // F12
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J
-            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
+            if(e.keyCode == 123) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
         }
 
-        // 3. Console Warning
         console.log("%cSTOP!", "color: red; font-size: 50px; font-weight: bold; text-shadow: 2px 2px #000;");
         console.log("%cThis area is for developers only. If you were told to paste something here, it is a scam.", "color: white; font-size: 16px;");
 
-        // --- NEW HACKER TEXT DECODE EFFECT ---
-        // IMPORTANT: Targeting h2 and h3 ONLY to prevent Hero h1 jitters
+        // --- HACKER TEXT DECODE EFFECT ---
         const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
 
         document.querySelectorAll("h2, h3").forEach(element => {
-            // Store original text
             element.dataset.value = element.innerText;
             
             element.onmouseover = event => {
@@ -747,18 +766,56 @@
             }
         });
 
-        // --- INTERACTIVE TERMINAL LOGIC ---
+        // --- ADVANCED TERMINAL WITH CRYPTOGRAPHY CTF ---
         const inputField = document.getElementById('cmd-input');
         const outputDiv = document.getElementById('terminal-output');
         const terminalWindow = document.querySelector('.terminal-window');
+        const promptText = document.getElementById('prompt-text');
         
-        // Secret State for 'su -'
+        let currentUser = "senura";
+        let currentPath = "~";
         let waitingForPassword = false;
+        
+        // Helper: Base64 Decode
+        function base64Decode(str) {
+            try { return atob(str); } catch(e) { return "[Invalid Base64]"; }
+        }
+        
+        // Helper: ROT13
+        function rot13(str) {
+            return str.replace(/[a-zA-Z]/g, function(c){
+                return String.fromCharCode((c <= "Z" ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26);
+            });
+        }
+        
+        // Simulated File System
+        const fileSystem = {
+            "~": {
+                files: ["readme.txt", "skills.txt"],
+                dirs: ["projects", ".shadows"]
+            },
+            "~/projects": {
+                files: ["network_scan.log", "exploit.py"],
+                dirs: []
+            },
+            "~/.shadows": {
+                files: ["cipher.txt"],
+                dirs: []
+            }
+        };
+
+        // File Contents (STORY BASED HINTS)
+        const fileContents = {
+            "readme.txt": "Welcome to the system.\n\nStory: The previous admin was brilliant but careless. He hid his secrets in the shadows, but he had a sticky 'G' key on his keyboard, so he often typed 'I' instead.\n\nCheck the dark corners of the file system to find what he left behind.",
+            "skills.txt": "CEH, Network Security, Linux, Python, Web Application Security",
+            "network_scan.log": "192.168.1.1 - Open Ports: 22, 80, 443\n192.168.1.2 - Open Ports: 21, 22",
+            "exploit.py": "# Python exploit script\nimport socket\n# [Redacted for security]",
+            "cipher.txt": "Gur frperg vf: synv{pelcgb_znfgre_2025}\n\n[Encrypted with ROT13]"
+        };
 
         inputField.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
-                const command = inputField.value.trim(); // Case sensitive for password
-                
+                const command = inputField.value.trim();
                 if(command || waitingForPassword) {
                     processCommand(command);
                     inputField.value = '';
@@ -767,68 +824,137 @@
         });
 
         function processCommand(cmd) {
-            // Display Command
             const cmdLine = document.createElement('div');
             
-            // If waiting for password, don't show the typed password
-            if(waitingForPassword) {
-                 // Do nothing visual for input
-            } else {
-                 cmdLine.innerHTML = `<span style="color:#00ff41; font-weight:bold; margin-right:8px;">user@senura:~$</span>${cmd}`;
+            if(!waitingForPassword) {
+                 // DYNAMIC PROMPT COLOR
+                 const userColor = currentUser === "root" ? "#FFD700" : "var(--accent-green)";
+                 cmdLine.innerHTML = `<span style="color:${userColor}; font-weight:bold; margin-right:8px;">${currentUser}@senura:${currentPath}$</span>${cmd}`;
                  outputDiv.appendChild(cmdLine);
             }
 
-            // Logic
             let response = '';
             
             if(waitingForPassword) {
-                // Check if password is "senura"
                 if(cmd === 'senura') {
                     response = "Nice try. Hacking yourself is not allowed.";
                 } else {
                     response = "Access denied.";
                 }
-                waitingForPassword = false; // Reset state
-                
+                waitingForPassword = false; 
             } else {
-                // Normal Commands (Lower case)
-                const lowerCmd = cmd.toLowerCase();
-                
-                switch(lowerCmd) {
+                const parts = cmd.split(" ");
+                const mainCmd = parts[0].toLowerCase();
+                const arg = parts.slice(1).join(" ");
+
+                switch(mainCmd) {
                     case 'help':
-                        response = "Available commands:\n- about: Who am I?\n- skills: My technical arsenal\n- projects: View my work\n- contact: Get in touch\n- clear: Clear terminal\n- whoami: Current user\n- su -: Switch user";
+                        response = "Available commands:\n- ls [-la]: List files\n- cd <dir>: Change directory\n- cat <file>: Read file\n- decode <base64>: Decode Base64\n- rot13 <text>: Decrypt ROT13\n- submit <flag>: Submit CTF flag\n- clear, whoami, su -";
                         break;
-                    case 'about':
-                        response = "Senura De Silva | 21 | Student at NIBM\nSpecializing in Network Engineering & Ethical Hacking.\nFocus: Red Teaming, Network Defense, IoT Security.";
-                        document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+                    
+                    case 'ls':
+                        if(arg === '-a' || arg === '-la') {
+                            const allContent = [...fileSystem[currentPath].dirs, ...fileSystem[currentPath].files];
+                             response = allContent.join("  ");
+                        } else {
+                            const visibleDirs = fileSystem[currentPath].dirs.filter(d => !d.startsWith('.'));
+                            const visibleFiles = fileSystem[currentPath].files.filter(f => !f.startsWith('.'));
+                            response = [...visibleDirs, ...visibleFiles].join("  ");
+                        }
+                        if(response === "") response = "(empty)";
                         break;
-                    case 'skills':
-                        response = "Loading Skillset...\n[+] Network Security (VLAN, VPN, IDS/IPS)\n[+] Ethical Hacking (PenTesting, Red Teaming)\n[+] Linux Ops (CentOS, Bash)\n[+] Hardware (Arduino, ESP32)\n[+] Programming (Python, PHP, SQL)";
-                        document.getElementById('skills').scrollIntoView({ behavior: 'smooth' });
+
+                    case 'cd':
+                        if(!arg || arg === "~") {
+                            currentPath = "~";
+                        } else if (arg === "..") {
+                            currentPath = "~"; 
+                        } else {
+                            if(fileSystem[currentPath].dirs.includes(arg)) {
+                                currentPath = currentPath === "~" ? `~/${arg}` : `${currentPath}/${arg}`;
+                            } else {
+                                response = `bash: cd: ${arg}: No such file or directory`;
+                            }
+                        }
                         break;
-                    case 'projects':
-                        response = "Fetching Operational Logs...\n1. Phishing Simulation\n2. Enterprise Network Design\n3. Malware Analysis Lab\n4. Multi-OS Org System";
-                        document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
+
+                    case 'cat':
+                        if(!arg) {
+                            response = "Usage: cat <filename>";
+                        } else {
+                            if(fileSystem[currentPath].files.includes(arg)) {
+                                response = fileContents[arg] || "[Binary Data]";
+                            } else {
+                                response = `cat: ${arg}: No such file or directory`;
+                            }
+                        }
                         break;
-                    case 'contact':
-                        response = "Opening encrypted channel...\nEmail: senurasilva21@gmail.com\nPhone: +94 71 577 3185\nLocation: Colombo, Sri Lanka";
-                        document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+
+                    // --- CRYPTOGRAPHY TOOLS ---
+                    case 'decode':
+                        if(!arg) {
+                            response = "Usage: decode <base64_string>";
+                        } else {
+                            response = "Decoded: " + base64Decode(arg);
+                        }
+                        break;
+
+                    case 'rot13':
+                        if(!arg) {
+                            response = "Usage: rot13 <encrypted_text>";
+                        } else {
+                            response = "Decrypted: " + rot13(arg);
+                        }
+                        break;
+
+                    case 'whoami':
+                        response = currentUser;
                         break;
                     case 'clear':
                         outputDiv.innerHTML = '';
                         return;
-                    case 'whoami':
-                        response = "senura";
-                        break;
-                    case 'su -':
-                        response = "Password:";
-                        waitingForPassword = true;
+                    case 'su':
+                        if(arg === '-') {
+                            response = "Password:";
+                            waitingForPassword = true;
+                        } else {
+                             response = "Usage: su -";
+                        }
                         break;
                     case 'sudo':
                          response = "User is not in the sudoers file. This incident will be reported.";
                          break;
+                    
+                    // --- CTF SUBMISSION ---
+                    case 'submit':
+                        if(arg === 'flag{crypto_master_2025}') {
+                            // --- VICTORY SEQUENCE ---
+                            response = "🎉 CORRECT FLAG IDENTIFIED.\n\n[SYSTEM OVERRIDE INITIATED]...\nACCESS LEVEL: GOD MODE.";
+                            
+                            // 1. Flash Screen & Change Variables
+                            document.body.classList.add('root-access');
+                            
+                            // 2. Change Prompt
+                            currentUser = "root";
+                            promptText.innerHTML = "root@senura:~$";
+                            promptText.style.color = "#FFD700";
+                            inputField.style.caretColor = "#FFD700";
+                            
+                            // 3. Update Text Content
+                            document.querySelector('.terminal-text').innerHTML = "root@senura:~$ GOD MODE ACTIVE";
+                            document.querySelector('.terminal-text').style.borderColor = "#FFD700";
+                            document.querySelector('.terminal-text').style.color = "#FFD700";
+                            document.querySelector('.terminal-text').style.backgroundColor = "rgba(255, 215, 0, 0.1)";
+
+                        } else if(arg === 'flai{crypto_master_2025}') {
+                            response = "⚠️ Close! Remember the story about the admin's sticky key? He types 'I' instead of 'G'. Fix the typo.";
+                        } else {
+                            response = "❌ Incorrect flag. Keep digging.";
+                        }
+                        break;
+
                     default:
-                        response = `Command not found: ${cmd}. Type 'help' for available commands.`;
+                        response = `Command not found: ${mainCmd}. Type 'help' for available commands.`;
                 }
             }
 
@@ -838,7 +964,6 @@
             respLine.innerText = response;
             outputDiv.appendChild(respLine);
 
-            // Scroll to bottom
             terminalWindow.scrollTop = terminalWindow.scrollHeight;
         }
     </script>
